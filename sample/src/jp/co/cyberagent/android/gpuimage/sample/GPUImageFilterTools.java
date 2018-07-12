@@ -16,17 +16,19 @@
 
 package jp.co.cyberagent.android.gpuimage.sample;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import jp.co.cyberagent.android.gpuimage.*;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
+import android.opengl.Matrix;
 
-public class GPUImageFilterTools {  
+import jp.co.cyberagent.android.gpuimage.*;
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class GPUImageFilterTools {
     public static void showDialog(final Context context,
             final OnGpuImageFilterChosenListener listener) {
         final FilterList filters = new FilterList();
@@ -91,6 +93,7 @@ public class GPUImageFilterTools {
         filters.addFilter("Sketch", FilterType.SKETCH);
         filters.addFilter("Toon", FilterType.TOON);
         filters.addFilter("Smooth Toon", FilterType.SMOOTH_TOON);
+        filters.addFilter("Halftone", FilterType.HALFTONE);
 
         filters.addFilter("Bulge Distortion", FilterType.BULGE_DISTORTION);
         filters.addFilter("Glass Sphere", FilterType.GLASS_SPHERE);
@@ -101,6 +104,15 @@ public class GPUImageFilterTools {
         filters.addFilter("Swirl", FilterType.SWIRL);
         filters.addFilter("Weak Pixel Inclusion", FilterType.WEAK_PIXEL_INCLUSION);
         filters.addFilter("False Color", FilterType.FALSE_COLOR);
+
+        filters.addFilter("Color Balance", FilterType.COLOR_BALANCE);
+
+        filters.addFilter("Levels Min (Mid Adjust)", FilterType.LEVELS_FILTER_MIN);
+
+        filters. addFilter("Bilateral Blur", FilterType.BILATERAL_BLUR);
+
+        filters.addFilter("Transform (2-D)", FilterType.TRANSFORM2D);
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose a filter");
@@ -166,11 +178,11 @@ public class GPUImageFilterTools {
             case MONOCHROME:
             	return new GPUImageMonochromeFilter(1.0f, new float[]{0.6f, 0.45f, 0.3f, 1.0f});
             case OPACITY:
-                return new GPUImageOpacityFilter(1.0f);  
+                return new GPUImageOpacityFilter(1.0f);
             case RGB:
-                return new GPUImageRGBFilter(1.0f, 1.0f, 1.0f);  
+                return new GPUImageRGBFilter(1.0f, 1.0f, 1.0f);
             case WHITE_BALANCE:
-                return new GPUImageWhiteBalanceFilter(5000.0f, 0.0f);    
+                return new GPUImageWhiteBalanceFilter(5000.0f, 0.0f);
             case VIGNETTE:
                 PointF centerPoint = new PointF();
                 centerPoint.x = 0.5f;
@@ -276,6 +288,20 @@ public class GPUImageFilterTools {
                 return new GPUImageWeakPixelInclusionFilter();
             case FALSE_COLOR:
                 return new GPUImageFalseColorFilter();
+            case COLOR_BALANCE:
+                return new GPUImageColorBalanceFilter();
+            case LEVELS_FILTER_MIN:
+                GPUImageLevelsFilter levelsFilter = new GPUImageLevelsFilter();
+                levelsFilter.setMin(0.0f, 3.0f, 1.0f);
+                return levelsFilter;
+            case HALFTONE:
+                return new GPUImageHalftoneFilter();
+
+            case BILATERAL_BLUR:
+                return new GPUImageBilateralFilter();
+
+            case TRANSFORM2D:
+                return new GPUImageTransformFilter();
 
             default:
                 throw new IllegalStateException("No filter of that type!");
@@ -304,7 +330,7 @@ public class GPUImageFilterTools {
         BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA,
         BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, LOOKUP_AMATORKA,
         GAUSSIAN_BLUR, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE, DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN, NON_MAXIMUM_SUPPRESSION,
-        SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR
+        SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN, BILATERAL_BLUR, HALFTONE, TRANSFORM2D
     }
 
     private static class FilterList {
@@ -375,7 +401,17 @@ public class GPUImageFilterTools {
                 adjuster = new SphereRefractionAdjuster().filter(filter);
             } else if (filter instanceof GPUImageSwirlFilter) {
                 adjuster = new SwirlAdjuster().filter(filter);
-            } else {
+            } else if (filter instanceof GPUImageColorBalanceFilter) {
+                adjuster = new ColorBalanceAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageLevelsFilter) {
+                adjuster = new LevelsMinMidAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageBilateralFilter) {
+                adjuster = new BilateralAdjuster().filter(filter);
+            } else if (filter instanceof GPUImageTransformFilter) {
+                adjuster = new RotateAdjuster().filter(filter);
+            }
+            else {
+
                 adjuster = null;
             }
         }
@@ -498,14 +534,14 @@ public class GPUImageFilterTools {
                 getFilter().setSaturation(range(percentage, 0.0f, 2.0f));
             }
         }
-        
+
         private class ExposureAdjuster extends Adjuster<GPUImageExposureFilter> {
             @Override
             public void adjust(final int percentage) {
                 getFilter().setExposure(range(percentage, -10.0f, 10.0f));
             }
-        }   
-        
+        }
+
         private class HighlightShadowAdjuster extends Adjuster<GPUImageHighlightShadowFilter> {
             @Override
             public void adjust(final int percentage) {
@@ -513,7 +549,7 @@ public class GPUImageFilterTools {
                 getFilter().setHighlights(range(percentage, 0.0f, 1.0f));
             }
         }
-        
+
         private class MonochromeAdjuster extends Adjuster<GPUImageMonochromeFilter> {
             @Override
             public void adjust(final int percentage) {
@@ -521,14 +557,14 @@ public class GPUImageFilterTools {
                 //getFilter().setColor(new float[]{0.6f, 0.45f, 0.3f, 1.0f});
             }
         }
-        
+
         private class OpacityAdjuster extends Adjuster<GPUImageOpacityFilter> {
             @Override
             public void adjust(final int percentage) {
                 getFilter().setOpacity(range(percentage, 0.0f, 1.0f));
             }
-        }   
-        
+        }
+
         private class RGBAdjuster extends Adjuster<GPUImageRGBFilter> {
             @Override
             public void adjust(final int percentage) {
@@ -536,8 +572,8 @@ public class GPUImageFilterTools {
                 //getFilter().setGreen(range(percentage, 0.0f, 1.0f));
                 //getFilter().setBlue(range(percentage, 0.0f, 1.0f));
             }
-        }   
-        
+        }
+
         private class WhiteBalanceAdjuster extends Adjuster<GPUImageWhiteBalanceFilter> {
             @Override
             public void adjust(final int percentage) {
@@ -611,5 +647,40 @@ public class GPUImageFilterTools {
                 getFilter().setAngle(range(percentage, 0.0f, 2.0f));
             }
         }
+
+        private class ColorBalanceAdjuster extends Adjuster<GPUImageColorBalanceFilter> {
+
+            @Override
+            public void adjust(int percentage) {
+                getFilter().setMidtones(new float[]{
+                        range(percentage, 0.0f, 1.0f),
+                        range(percentage / 2, 0.0f, 1.0f),
+                        range(percentage / 3, 0.0f, 1.0f)});
+            }
+        }
+
+        private class LevelsMinMidAdjuster extends Adjuster<GPUImageLevelsFilter> {
+            @Override
+            public void adjust(int percentage) {
+                getFilter().setMin(0.0f, range(percentage, 0.0f, 1.0f), 1.0f);
+            }
+        }
+
+        private class BilateralAdjuster extends Adjuster<GPUImageBilateralFilter> {
+            @Override
+            public void adjust(final int percentage) {
+                getFilter().setDistanceNormalizationFactor(range(percentage, 0.0f, 15.0f));
+            }
+        }
+
+        private class RotateAdjuster extends Adjuster<GPUImageTransformFilter> {
+            @Override
+            public void adjust(final int percentage) {
+                float[] transform = new float[16];
+                Matrix.setRotateM(transform, 0, 360 * percentage / 100, 0, 0, 1.0f);
+                getFilter().setTransform3D(transform);
+            }
+        }
+
     }
 }
