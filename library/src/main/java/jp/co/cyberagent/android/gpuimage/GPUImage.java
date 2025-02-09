@@ -67,6 +67,7 @@ public class GPUImage {
     private GPUImageFilter filter;
     private Bitmap currentBitmap;
     private ScaleType scaleType = ScaleType.CENTER_CROP;
+    private int scaleWidth, scaleHeight;
 
     /**
      * Instantiates a new GPUImage object.
@@ -249,6 +250,16 @@ public class GPUImage {
         renderer.deleteImage();
         currentBitmap = null;
         requestRender();
+    }
+
+    /**
+     * This gets the size of the image. This makes it easier to adjust
+     * the size of your imagePreview to the the size of the scaled image.
+     *
+     * @return array with width and height of bitmap image
+     */
+    public int[] getScaleSize() {
+        return new int[] {scaleWidth, scaleHeight};
     }
 
     /**
@@ -729,6 +740,8 @@ public class GPUImage {
                 newWidth = outputWidth;
                 newHeight = (newWidth / width) * height;
             }
+            scaleWidth = Math.round(newWidth);
+            scaleHeight = Math.round(newHeight);
             return new int[]{Math.round(newWidth), Math.round(newHeight)};
         }
 
@@ -765,5 +778,9 @@ public class GPUImage {
 
     public interface ResponseListener<T> {
         void response(T item);
+    }
+
+    public GPUImageRenderer getRenderer() {
+        return renderer;
     }
 }

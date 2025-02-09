@@ -1,6 +1,7 @@
 # GPUImage for Android
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Download](https://api.bintray.com/packages/cats-oss/maven/gpuimage/images/download.svg) ](https://bintray.com/cats-oss/maven/gpuimage/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/jp.co.cyberagent.android/gpuimage/badge.svg)](https://search.maven.org/artifact/jp.co.cyberagent.android/gpuimage)
 [![Build Status](https://app.bitrise.io/app/d8d8090a71066e7c/status.svg?token=sJNbvX8CkecWcUA5Z898lQ&branch=master)](https://app.bitrise.io/app/d8d8090a71066e7c)
 
 Idea from: [iOS GPUImage framework](https://github.com/BradLarson/GPUImage2)
@@ -16,7 +17,7 @@ Goal is to have something as similar to GPUImage as possible. Vertex and fragmen
 
 ```groovy
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -149,7 +150,7 @@ public override fun onCreate(savedInstanceState: Bundle?) {
 - [x] Transform Operation
 - [ ] Crop
 - [x] Gamma
-- [ ] Highlights and Shadows
+- [x] Highlights and Shadows
 - [x] Haze
 - [x] Sepia Tone
 - [ ] Amatorka
@@ -157,8 +158,8 @@ public override fun onCreate(savedInstanceState: Bundle?) {
 - [ ] Soft Elegance
 - [x] Color Inversion
 - [x] Solarize
-- [ ] Vibrance
-- [x] Highlight and Shadow Tint
+- [x] Vibrance
+- [ ] Highlight and Shadow Tint
 - [x] Luminance
 - [x] Luminance Threshold
 - [ ] Average Color
@@ -198,7 +199,7 @@ public override fun onCreate(savedInstanceState: Bundle?) {
 - [x] Box Blur
 - [x] Bilateral Blur
 - [ ] Motion Blur
-- [ ] Zoom Blur
+- [x] Zoom Blur
 - [ ] iOS Blur
 - [ ] Median Filter
 - [x] Swirl Distortion
@@ -214,7 +215,7 @@ public override fun onCreate(savedInstanceState: Bundle?) {
 - [ ] Local Binary Pattern
 - [ ] Color Local Binary Pattern
 - [x] Dissolve Blend
-- [ ] Chroma Key Blend
+- [x] Chroma Key Blend
 - [x] Add Blend
 - [x] Divide Blend
 - [x] Multiply Blend
@@ -231,7 +232,7 @@ public override fun onCreate(savedInstanceState: Bundle?) {
 - [x] HardLight Blend
 - [x] SoftLight Blend
 - [x] Color Blend
-- [ ] Hue Blend
+- [x] Hue Blend
 - [x] Saturation Blend
 - [x] Luminosity Blend
 - [x] Normal Blend

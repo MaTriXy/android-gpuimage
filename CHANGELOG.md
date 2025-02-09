@@ -1,6 +1,34 @@
 Change Log
 ==========
 
+Version 2.1.0 *(2020-09-21)*
+----------------------------
+
+* Update
+  * Kotlin to 1.3.72
+  * The targetSdkVersion from 28 to 30
+  * The compileSdkVersion from 28 to 30
+
+Version 2.0.4 *(2019-08-13)*
+----------------------------
+
+* Update
+  * Kotlin to 1.3.41
+  * Android Gradle tools to 3.6.0-alpha05
+  * Gradle wrapper to 5.5
+
+* Add
+  64bit build settings for clearly
+  Can get size of rescaled image [#443](https://github.com/cats-oss/android-gpuimage/pull/443)
+        
+* Bug fix
+  GPUImageZoomBlurFilter incorrect args [#454](https://github.com/cats-oss/android-gpuimage/pull/454)
+
+Version 2.0.3 *(2018-11-09)*
+----------------------------
+
+* Add GPUImageVibranceFilter (by @itome)
+
 Version 2.0.2 *(2018-11-01)*
 ----------------------------
 
